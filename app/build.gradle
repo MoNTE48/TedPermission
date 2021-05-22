@@ -37,6 +37,7 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     implementation project(':tedpermission')
+    implementation project(':tedpermission-rx3')
     implementation project(':tedpermission-rx2')
     implementation project(':tedpermission-rx1')
 }
