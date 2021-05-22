@@ -10,10 +10,11 @@ import android.net.Uri;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.core.app.ActivityCompat;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.WindowManager;
@@ -140,16 +141,12 @@ public class TedPermissionActivity extends AppCompatActivity {
         final Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, uri);
 
         if (!TextUtils.isEmpty(rationale_message)) {
-            new AlertDialog.Builder(this, R.style.Theme_AppCompat_Light_Dialog_Alert)
+            new AlertDialog.Builder(this, R.style.AlertDialog)
                     .setMessage(rationale_message)
                     .setCancelable(false)
 
-                    .setNegativeButton(rationaleConfirmText, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            startActivityForResult(intent, REQ_CODE_SYSTEM_ALERT_WINDOW_PERMISSION_REQUEST);
-                        }
-                    })
+                    .setNegativeButton(rationaleConfirmText, (dialogInterface, i) ->
+                            startActivityForResult(intent, REQ_CODE_SYSTEM_ALERT_WINDOW_PERMISSION_REQUEST))
                     .show();
             isShownRationaleDialog = true;
         } else {
@@ -216,18 +213,13 @@ public class TedPermissionActivity extends AppCompatActivity {
 
     private void showRationaleDialog(final List<String> needPermissions) {
 
-        new AlertDialog.Builder(this, R.style.Theme_AppCompat_Light_Dialog_Alert)
+        new AlertDialog.Builder(this, R.style.AlertDialog)
                 .setTitle(rationaleTitle)
                 .setMessage(rationale_message)
                 .setCancelable(false)
 
-                .setNegativeButton(rationaleConfirmText, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        requestPermissions(needPermissions);
-
-                    }
-                })
+                .setNegativeButton(rationaleConfirmText, (dialogInterface, i) ->
+                        requestPermissions(needPermissions))
                 .show();
         isShownRationaleDialog = true;
 
@@ -259,6 +251,7 @@ public class TedPermissionActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
 
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         List<String> deniedPermissions = TedPermissionBase.getDeniedPermissions(this, permissions);
 
         if (deniedPermissions.isEmpty()) {
@@ -276,17 +269,13 @@ public class TedPermissionActivity extends AppCompatActivity {
             return;
         }
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.Theme_AppCompat_Light_Dialog_Alert);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialog);
 
         builder.setTitle(denyTitle)
                 .setMessage(denyMessage)
                 .setCancelable(false)
-                .setNegativeButton(deniedCloseButtonText, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        permissionResult(deniedPermissions);
-                    }
-                });
+                .setNegativeButton(deniedCloseButtonText, (dialogInterface, i) ->
+                        permissionResult(deniedPermissions));
 
         if (hasSettingButton) {
 
@@ -294,13 +283,8 @@ public class TedPermissionActivity extends AppCompatActivity {
                 settingButtonText = getString(R.string.tedpermission_setting);
             }
 
-            builder.setPositiveButton(settingButtonText, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    TedPermissionBase.startSettingActivityForResult(TedPermissionActivity.this);
-
-                }
-            });
+            builder.setPositiveButton(settingButtonText, (dialog, which) ->
+                    TedPermissionBase.startSettingActivityForResult(TedPermissionActivity.this));
 
         }
         builder.show();
@@ -322,31 +306,23 @@ public class TedPermissionActivity extends AppCompatActivity {
 
     }
 
+    @TargetApi(VERSION_CODES.M)
     public void showWindowPermissionDenyDialog() {
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.Theme_AppCompat_Light_Dialog_Alert);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialog);
         builder.setMessage(denyMessage)
                 .setCancelable(false)
-                .setNegativeButton(deniedCloseButtonText, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        checkPermissions(false);
-                    }
-                });
+                .setNegativeButton(deniedCloseButtonText, (dialogInterface, i) -> checkPermissions(false));
 
         if (hasSettingButton) {
             if (TextUtils.isEmpty(settingButtonText)) {
                 settingButtonText = getString(R.string.tedpermission_setting);
             }
 
-            builder.setPositiveButton(settingButtonText, new DialogInterface.OnClickListener() {
-                @TargetApi(VERSION_CODES.M)
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    Uri uri = Uri.fromParts("package", packageName, null);
-                    final Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, uri);
-                    startActivityForResult(intent, REQ_CODE_SYSTEM_ALERT_WINDOW_PERMISSION_REQUEST_SETTING);
-                }
+            builder.setPositiveButton(settingButtonText, (dialog, which) -> {
+                Uri uri = Uri.fromParts("package", packageName, null);
+                final Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, uri);
+                startActivityForResult(intent, REQ_CODE_SYSTEM_ALERT_WINDOW_PERMISSION_REQUEST_SETTING);
             });
 
         }

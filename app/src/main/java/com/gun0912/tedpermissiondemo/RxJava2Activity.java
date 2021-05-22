@@ -2,8 +2,8 @@ package com.gun0912.tedpermissiondemo;
 
 import android.Manifest;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import android.widget.Toast;
 
 import com.tedpark.tedpermission.rx2.TedRx2Permission;
