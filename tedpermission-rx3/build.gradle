@@ -27,4 +27,4 @@ dependencies {
     api deps.rx.rxJava3
 }
 
-apply from: rootProject.file('publish.gradle')
+//apply from: rootProject.file('publish.gradle')
